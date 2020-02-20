@@ -1,3 +1,3 @@
-#javaFXTemplate
+# Proyecto Final PGV
 
-Plantilla de creación de proyectos **JavaFX** con Maven.
+Proyecto final de Programación de Servicios y Procesos usando sockets y JavaFX.
