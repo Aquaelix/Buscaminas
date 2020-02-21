@@ -9,7 +9,7 @@
 		<maven.compiler.target>11</maven.compiler.target>
 		<maven.compiler.source>11</maven.compiler.source>
 		<proyect.build.sourceEncoding>UTF-8</proyect.build.sourceEncoding>
-		<exec.mainClass>dad.javafx.mvc.Main</exec.mainClass>
+		<exec.mainClass></exec.mainClass>
 	</properties>
 
 	<dependencies>

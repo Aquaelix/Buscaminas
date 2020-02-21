@@ -158,9 +158,13 @@ public class PlayerController implements Initializable {
 					.println("Horizontal= " + usernamePassword.getKey() + ", Vertical= " + usernamePassword.getValue());
 			casilla = result.get();
 		});
-
+//añadir por aqui un mostrar antes de enviar y otro despues
 		int resultado = panel.clickCasilla(Integer.valueOf(casilla.getKey()) - 1,
 				Integer.valueOf(casilla.getValue()) - 1);
+		System.out.println("Panelsinbombas");
+		System.out.println(panel);
+		System.out.println("Panelbombas");
+		System.out.println(panel.showAll());
 System.out.println(casilla.getKey() + " "+casilla.getValue());
 		if (resultado != -2) {
 			if (resultado == -1) {

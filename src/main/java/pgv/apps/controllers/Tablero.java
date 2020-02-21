@@ -53,7 +53,7 @@ public class Tablero implements Serializable {
 	}
 
 	public int clickCasilla(int hor, int ver) {
-		if (!campoVista[hor][ver].equals("X")) {
+		if (campoVista[hor][ver].equals("X")) {
 			if (campo[hor][ver].equals("*")) {
 				campoVista[hor][ver] = "*";
 				for (int x = 0; x < alto; x++)
