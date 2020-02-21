@@ -333,7 +333,7 @@ public class PlayerController implements Initializable {
 					if (panel.isCaput()) {
 
 						updateMessage("Fin del juego, revisa con tu compañero los resultados.");
-						this.cancelled();
+						this.cancel();
 					} else {
 //System.out.println(panel);
 						envio.set(false);
