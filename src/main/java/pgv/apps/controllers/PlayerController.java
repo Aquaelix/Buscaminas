@@ -11,7 +11,6 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
@@ -161,11 +160,11 @@ public class PlayerController implements Initializable {
 //añadir por aqui un mostrar antes de enviar y otro despues
 		int resultado = panel.clickCasilla(Integer.valueOf(casilla.getKey()) - 1,
 				Integer.valueOf(casilla.getValue()) - 1);
-		System.out.println("Panelsinbombas");
-		System.out.println(panel);
-		System.out.println("Panelbombas");
-		System.out.println(panel.showAll());
-System.out.println(casilla.getKey() + " "+casilla.getValue());
+//		System.out.println("Panelsinbombas");
+//		System.out.println(panel);
+//		System.out.println("Panelbombas");
+//		System.out.println(panel.showAll());
+//System.out.println(casilla.getKey() + " "+casilla.getValue());
 		if (resultado != -2) {
 			if (resultado == -1) {
 				Alert alert = new Alert(AlertType.ERROR);
@@ -174,10 +173,11 @@ System.out.println(casilla.getKey() + " "+casilla.getValue());
 				alert.setContentText("Has encontrado una mina");
 
 				minasArea.textProperty().unbind();
-				minasArea.setText(panel.showBombs());
+//				minasArea.setText(panel.showBombs());
 
+				panel.setCaput(true);
 				alert.showAndWait();
-				Platform.exit();
+//				Platform.exit();
 			} else if (resultado == 0) {
 				Alert alert = new Alert(AlertType.INFORMATION);
 				alert.setTitle("¡Felicidades!");
@@ -185,10 +185,11 @@ System.out.println(casilla.getKey() + " "+casilla.getValue());
 				alert.setContentText("¡Has ganado!");
 
 				minasArea.textProperty().unbind();
-				minasArea.setText(panel.showAll());
+//				minasArea.setText(panel.showAll());
 
+				panel.setCaput(true);
 				alert.showAndWait();
-				Platform.exit();
+//				Platform.exit();
 			} else {
 				Alert alert = new Alert(AlertType.INFORMATION);
 				alert.setTitle("¡Buena!");
@@ -201,7 +202,7 @@ System.out.println(casilla.getKey() + " "+casilla.getValue());
 		envio.set(true);
 		try {
 			oos.writeObject(panel);
-System.out.println("envio");
+			System.out.println("envio");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -250,7 +251,7 @@ System.out.println("envio");
 			enviarButton.disableProperty().bind(textoField.textProperty().isEmpty());
 
 			minasArea.textProperty().bind(escuchaObj.messageProperty());
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -324,20 +325,27 @@ System.out.println("envio");
 		protected Void call() throws Exception {
 			try {
 				System.out.println("Escuchando");
-				while(!isCancelled()) {
+				while (!isCancelled()) {
 
-				System.out.println("Hablo desde hiloObjeto, creando Tablero");
-				panel = (Tablero) ois.readObject();
+					System.out.println("Hablo desde hiloObjeto, creando Tablero");
+					panel = (Tablero) ois.readObject();
 
-System.out.println(panel);
-				envio.set(false);
-								
-				updateMessage(panel.toString());
+					if (panel.isCaput()) {
+
+						updateMessage("Fin del juego, revisa con tu compañero los resultados.");
+						this.cancelled();
+					} else {
+//System.out.println(panel);
+						envio.set(false);
+
+						updateMessage(panel.toString());
+					}
 				}
 				lectura.close();
 			} catch (Exception e) {
 				e.printStackTrace();
-			}			return null;
+			}
+			return null;
 		}
 	}
 }

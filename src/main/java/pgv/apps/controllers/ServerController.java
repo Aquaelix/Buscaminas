@@ -13,11 +13,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
@@ -38,22 +36,6 @@ public class ServerController implements Initializable {
 
 	@FXML
 	private TextArea textoArea;
-
-	@FXML
-	private Button byeButton;
-
-	@FXML
-	private Button byeByeButton;
-
-	@FXML
-	void onByeAction(ActionEvent event) {
-
-	}
-
-	@FXML
-	void onByeByeAction(ActionEvent event) {
-
-	}
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -97,27 +79,11 @@ public class ServerController implements Initializable {
 				clientesMinas.add(new Jugador(socketObjeto, false));
 
 				jugadores--;
-				System.out.println("Jugador aceptado ;D "+jugadores);
+//				System.out.println("Jugador aceptado ;D "+jugadores);
 			} while (jugadores != 0);
 
 			ServerController.clientesMinas.get(0).outObjeto.writeObject(panel);
-			System.out.println("ENVIO AL 1 tablero");
-
-
-//			ServerController.clientesMinas.get(0).outObjeto.writeObject(panel.getCampoVista());
-//			System.out.println("ENVIO AL 1 campo");
-//			
-//			ServerController.clientesMinas.get(0).outObjeto.writeObject(panel.getCampo());
-//			System.out.println("ENVIO AL 1 minas");
-//
-//			ServerController.clientesMinas.get(0).outObjeto.writeObject(panel.getAlto());
-//			System.out.println("ENVIO AL 1 alto");
-//			
-//			ServerController.clientesMinas.get(0).outObjeto.writeObject(panel.getAncho());
-//			System.out.println("ENVIO AL 1 ancho");
-//			
-//			ServerController.clientesMinas.get(0).outObjeto.writeObject(panel.getNumMinas());
-//			System.out.println("ENVIO AL 1 minasMaximas");
+//			System.out.println("ENVIO AL 1 tablero");
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -199,7 +165,10 @@ public class ServerController implements Initializable {
 								jugador = 0;
 							ServerController.clientesMinas.get(jugador).outObjeto.writeObject(buscaminas);
 							
-System.out.println("Hablo desde hiloMina, mando Buscaminas");
+							if(buscaminas.isCaput())
+								this.interrumpir();
+							
+//System.out.println("Hablo desde hiloMina, mando Buscaminas");
 
 						} catch (Exception e) {
 							System.out.println("Vaya... un error: " + e.getMessage());
@@ -240,7 +209,8 @@ System.out.println("Hablo desde hiloMina, mando Buscaminas");
 			// leer del socket
 			// recorrer la lista escribiendo por output para el resto de los clientes
 			try {
-				System.out.println("Escuchando chat");
+//				System.out.println("Jugador conectado"+cliente.toString());
+				textoArea.setText("Jugador: "+cliente.toString()+" conectado.");
 
 				while (!isInterrupted()) {
 					if (cliente.dis.available() > 1) {
@@ -252,8 +222,8 @@ System.out.println("Hablo desde hiloMina, mando Buscaminas");
 								ServerController.clientesChat.get(i).dos.writeUTF(texto);
 						}
 						
-						textoArea.setText(texto+"\n"+textoArea.getText());
-System.out.println("Hablo desde hiloChat, mando chat");
+						textoArea.setText("Jugador: "+cliente.toString() +texto+"\n"+textoArea.getText());
+//System.out.println("Hablo desde hiloChat, mando chat");
 						
 					}
 

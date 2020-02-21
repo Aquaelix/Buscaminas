@@ -14,6 +14,16 @@ public class Tablero implements Serializable {
 	private String[][] campo;
 
 	private int numMinas, alto, ancho;
+	
+	private boolean caput = false;
+
+	public boolean isCaput() {
+		return caput;
+	}
+
+	public void setCaput(boolean caput) {
+		this.caput = caput;
+	}
 
 	public Tablero() {
 	}
