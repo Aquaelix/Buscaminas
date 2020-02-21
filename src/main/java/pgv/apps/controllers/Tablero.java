@@ -98,13 +98,13 @@ public class Tablero implements Serializable {
 				if (x >= 0 && x < alto && y >= 0 && y < ancho && !(x == ff && y == cc)
 						&& campoVista[x][y].equals("X")) {
 					int numMinas = CuentaMinas(x, y);
-					switch (numMinas) {
-					case 0:
-						AutoDescubrir(x, y);
-						break;
-					default:
+//					switch (numMinas) {
+//					case 0:
+//						AutoDescubrir(x, y);
+//						break;
+//					default:
 						campoVista[x][y] = Integer.toString(numMinas);
-					}
+//					}
 				}
 			}
 	}
