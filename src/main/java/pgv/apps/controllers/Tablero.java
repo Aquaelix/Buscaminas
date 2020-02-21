@@ -14,7 +14,7 @@ public class Tablero implements Serializable {
 	private String[][] campo;
 
 	private int numMinas, alto, ancho;
-	
+
 	private boolean caput = false;
 
 	public boolean isCaput() {
@@ -53,13 +53,13 @@ public class Tablero implements Serializable {
 		}
 
 	}
-	
+
 	public Tablero(String[][] campo, String[][] minas, int alto, int ancho, int minaNum) {
-		this.alto=alto;
-		this.ancho=ancho;
-		this.campo=minas;
-		this.campoVista=campo;
-		this.numMinas=minaNum;
+		this.alto = alto;
+		this.ancho = ancho;
+		this.campo = minas;
+		this.campoVista = campo;
+		this.numMinas = minaNum;
 	}
 
 	public int clickCasilla(int hor, int ver) {
@@ -82,7 +82,7 @@ public class Tablero implements Serializable {
 				default:
 					campoVista[hor][ver] = Integer.toString(numMinas);
 				}
-				
+
 			}
 			int nd = numDescubiertas();
 			if ((alto * ancho) - nd == numMinas) {
@@ -109,13 +109,7 @@ public class Tablero implements Serializable {
 				if (x >= 0 && x < alto && y >= 0 && y < ancho && !(x == ff && y == cc)
 						&& campoVista[x][y].equals("X")) {
 					int numMinas = CuentaMinas(x, y);
-//					switch (numMinas) {
-//					case 0:
-//						AutoDescubrir(x, y);
-//						break;
-//					default:
-						campoVista[x][y] = Integer.toString(numMinas);
-//					}
+					campoVista[x][y] = Integer.toString(numMinas);
 				}
 			}
 	}
@@ -226,7 +220,7 @@ public class Tablero implements Serializable {
 
 		return string.toString();
 	}
-	
+
 	public String showAll() {
 		StringBuilder string = new StringBuilder();
 		string.append(" ");
@@ -247,9 +241,9 @@ public class Tablero implements Serializable {
 			}
 
 			for (int j = 0; j < campoVista[i].length; j++) {
-				if(!campo[i][j].equals("*")) {
+				if (!campo[i][j].equals("*")) {
 					string.append(campoVista[i][j] + "  ");
-				}else {
+				} else {
 					string.append(campo[i][j] + "  ");
 				}
 			}

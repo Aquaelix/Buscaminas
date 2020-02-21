@@ -158,8 +158,19 @@ public class PlayerController implements Initializable {
 			casilla = result.get();
 		});
 //añadir por aqui un mostrar antes de enviar y otro despues
-		int resultado = panel.clickCasilla(Integer.valueOf(casilla.getKey()) - 1,
-				Integer.valueOf(casilla.getValue()) - 1);
+		String hor=casilla.getValue(), ver=casilla.getKey();
+		int iHor, iVer;
+		if(hor.charAt(0)>=65)
+			iHor = (int) hor.charAt(0) -55;
+		else
+			iHor = Integer.valueOf(hor);
+		
+		if(ver.charAt(0)>=65)
+			iVer = (int) ver.charAt(0)-55;
+		else
+			iVer = Integer.valueOf(ver);
+		
+		int resultado = panel.clickCasilla(iHor - 1,iVer - 1);
 //		System.out.println("Panelsinbombas");
 //		System.out.println(panel);
 //		System.out.println("Panelbombas");
