@@ -96,7 +96,7 @@ public class Tablero implements Serializable {
 		for (int x = ff - 1; x <= ff + 1; x++)
 			for (int y = cc - 1; y <= cc + 1; y++) {
 				if (x >= 0 && x < alto && y >= 0 && y < ancho && !(x == ff && y == cc)
-						&& !campoVista[x][y].equals("X")) {
+						&& campoVista[x][y].equals("X")) {
 					int numMinas = CuentaMinas(x, y);
 					switch (numMinas) {
 					case 0:
