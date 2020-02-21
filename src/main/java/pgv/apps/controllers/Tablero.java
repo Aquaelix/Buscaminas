@@ -66,6 +66,7 @@ public class Tablero implements Serializable {
 				int numMinas = CuentaMinas(hor, ver);
 				switch (numMinas) {
 				case 0:
+					campoVista[hor][ver] = Integer.toString(numMinas);
 					AutoDescubrir(hor, ver);
 					break;
 				default:
