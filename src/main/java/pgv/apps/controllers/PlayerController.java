@@ -184,7 +184,7 @@ public class PlayerController implements Initializable {
 				alert.setContentText("Has encontrado una mina");
 
 				minasArea.textProperty().unbind();
-//				minasArea.setText(panel.showBombs());
+				minasArea.setText(panel.showBombs());
 
 				panel.setCaput(true);
 				alert.showAndWait();
@@ -196,7 +196,7 @@ public class PlayerController implements Initializable {
 				alert.setContentText("¡Has ganado!");
 
 				minasArea.textProperty().unbind();
-//				minasArea.setText(panel.showAll());
+				minasArea.setText(panel.showAll());
 
 				panel.setCaput(true);
 				alert.showAndWait();
