@@ -14,7 +14,7 @@ public class PlayerApp extends Application {
 
 		controller = new PlayerController();
 		
-		Scene scene = new Scene(controller.getRoot(), 400, 400);
+		Scene scene = new Scene(controller.getRoot(), 600, 600);
 		
 		primaryStage.setTitle("Buscaminas");
 		primaryStage.setScene(scene);

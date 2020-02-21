@@ -38,7 +38,22 @@
       </BorderPane>
       <BorderPane fx:id="buscaminasPane" prefHeight="200.0" prefWidth="200.0">
          <bottom>
-            <Button fx:id="liberButton" mnemonicParsing="false" onAction="#onLiberAction" text="Me libré de esta ;D" BorderPane.alignment="CENTER" />
-         </bottom></BorderPane>
+            <Button fx:id="escogerButton" mnemonicParsing="false" onAction="#onSelectAction" text="Elijo..." BorderPane.alignment="CENTER">
+               <BorderPane.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </BorderPane.margin>
+            </Button>
+         </bottom>
+         <center>
+            <VBox BorderPane.alignment="CENTER">
+               <BorderPane.margin>
+                  <Insets bottom="5.0" left="15.0" right="15.0" top="15.0" />
+               </BorderPane.margin>
+               <children>
+                  <Label text="Chanclas:" />
+                  <TextArea fx:id="minasArea" prefHeight="200.0" prefWidth="200.0" wrapText="true" VBox.vgrow="ALWAYS" />
+               </children>
+            </VBox>
+         </center></BorderPane>
    </items>
 </SplitPane>

@@ -11,18 +11,30 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.util.Pair;
 
 public class PlayerController implements Initializable {
 
@@ -35,8 +47,10 @@ public class PlayerController implements Initializable {
 
 	private BooleanProperty envio = new SimpleBooleanProperty(false);
 
+	private Pair<String, String> casilla = null;
+
 	// model
-	private Buscaminas panel;
+	private Tablero panel;
 	private String host;
 
 	@FXML
@@ -49,7 +63,10 @@ public class PlayerController implements Initializable {
 	private TextField textoField;
 
 	@FXML
-	private Button liberButton;
+	private TextArea minasArea;
+
+	@FXML
+	private Button escogerButton;
 
 	@FXML
 	private Button enviarButton;
@@ -61,11 +78,10 @@ public class PlayerController implements Initializable {
 	void onEnviarAction(ActionEvent event) {
 
 		try {
-			if (!textoField.getText().trim().equals("")) {
-				os.writeUTF(textoField.getText());
+			os.writeUTF(textoField.getText());
 
-				textoArea.setText("Tú: " + textoField.getText() + "\n" + textoArea.getText());
-			}
+			textoArea.setText("Tú: " + textoField.getText() + "\n" + textoArea.getText());
+
 			textoField.setText("");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -73,7 +89,109 @@ public class PlayerController implements Initializable {
 	}
 
 	@FXML
-	void onLiberAction(ActionEvent event) {
+	void onSelectAction(ActionEvent event) {
+
+		Dialog<Pair<String, String>> dialog = new Dialog<>();
+		dialog.setTitle("¿Coordenadas?");
+		dialog.setHeaderText("Necesito la casilla: ");
+
+		ButtonType insertButton = new ButtonType("Seleccionar", ButtonData.OK_DONE);
+		dialog.getDialogPane().getButtonTypes().addAll(insertButton, ButtonType.CANCEL);
+
+		GridPane grid = new GridPane();
+		grid.setHgap(10);
+		grid.setVgap(10);
+		grid.setPadding(new Insets(20, 150, 10, 10));
+
+		TextField horizontal = new TextField();
+		TextField vertical = new TextField();
+
+		grid.add(new Label("Horizontal: "), 0, 0);
+		grid.add(horizontal, 1, 0);
+		grid.add(new Label("Vertical: "), 0, 1);
+		grid.add(vertical, 1, 1);
+
+		Node loginButton = dialog.getDialogPane().lookupButton(insertButton);
+		loginButton.setDisable(true);
+
+		horizontal.textProperty().addListener((observable, oldValue, newValue) -> {
+			int lado = panel.getAlto();
+			if (lado == 5) {
+				loginButton.setDisable(
+						(!((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 53)) || newValue.trim().isEmpty()));
+			} else if (lado == 10) {
+				loginButton.setDisable(!(((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 57))
+						|| (newValue.charAt(0) == 65) || newValue.trim().isEmpty()));
+			} else {
+				loginButton.setDisable(!(((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 57))
+						|| ((newValue.charAt(0) >= 65) && (newValue.charAt(0) <= 70)) || newValue.trim().isEmpty()));
+			}
+		});
+
+		vertical.textProperty().addListener((observable, oldValue, newValue) -> {
+			int lado = panel.getAlto();
+			if (lado == 5) {
+				loginButton.setDisable(
+						(!((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 53)) || newValue.trim().isEmpty()));
+			} else if (lado == 10) {
+				loginButton.setDisable(!(((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 57))
+						|| (newValue.charAt(0) == 65) || newValue.trim().isEmpty()));
+			} else {
+				loginButton.setDisable(!(((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 57))
+						|| ((newValue.charAt(0) >= 65) && (newValue.charAt(0) <= 70)) || newValue.trim().isEmpty()));
+			}
+		});
+
+		dialog.getDialogPane().setContent(grid);
+
+		dialog.setResultConverter(dialogButton -> {
+			if (dialogButton == insertButton) {
+				return new Pair<>(horizontal.getText(), vertical.getText());
+			}
+			return null;
+		});
+
+		Optional<Pair<String, String>> result = dialog.showAndWait();
+
+		result.ifPresent(usernamePassword -> {
+			System.out
+					.println("Horizontal= " + usernamePassword.getKey() + ", Vertical= " + usernamePassword.getValue());
+			casilla = result.get();
+		});
+
+		int resultado = panel.clickCasilla(Integer.valueOf(casilla.getKey()) - 1,
+				Integer.valueOf(casilla.getValue()) - 1);
+
+		if (resultado != -2) {
+			if (resultado == -1) {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Vaya...");
+				alert.setHeaderText("Fin del juego");
+				alert.setContentText("Has encontrado una mina");
+
+				minasArea.textProperty().unbind();
+				minasArea.setText(panel.showBombs());
+
+				alert.showAndWait();
+				Platform.exit();
+			} else if (resultado == 0) {
+				Alert alert = new Alert(AlertType.INFORMATION);
+				alert.setTitle("¡Felicidades!");
+				alert.setHeaderText(null);
+				alert.setContentText("¡Has ganado!");
+
+				minasArea.textProperty().unbind();
+				minasArea.setText(panel.showAll());
+
+				alert.showAndWait();
+				Platform.exit();
+			} else {
+				Alert alert = new Alert(AlertType.INFORMATION);
+				alert.setTitle("¡Buena!");
+				alert.setHeaderText("Sabia elección");
+				alert.setContentText("No hay bomba, toca esperar a tu compañero");
+			}
+		}
 
 		envio.set(true);
 		try {
@@ -87,12 +205,6 @@ public class PlayerController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 
-		// bindeo
-		liberButton.disableProperty().bind(envio);
-
-//		System.out.println("Panel:\n"+panel.toString());
-//		buscaminasPane.setCenter(panel);
-
 		// resto de codigo
 		TextInputDialog dialog = new TextInputDialog();
 		dialog.setTitle("Necesito IP");
@@ -101,7 +213,7 @@ public class PlayerController implements Initializable {
 
 		Optional<String> result = dialog.showAndWait();
 		if (result.isPresent()) {
-			System.out.println("Mi IP: " + result.get());
+//System.out.println("Mi IP: " + result.get());
 			host = result.get();
 		}
 
@@ -114,7 +226,7 @@ public class PlayerController implements Initializable {
 		try {
 			clientSocket.connect(addr);
 			clientSocketObject.connect(addrObject);
-			System.out.println("CONECTADO");
+//System.out.println("CONECTADO");
 			oos = new ObjectOutputStream(clientSocketObject.getOutputStream());
 			ois = new ObjectInputStream(clientSocketObject.getInputStream());
 
@@ -125,8 +237,14 @@ public class PlayerController implements Initializable {
 			escuchaChat.start();
 
 			escuchaObj = new ObjectReceive(ois);
-			escuchaObj.start();
+			new Thread(escuchaObj).start();
 
+			// bindeo
+			escogerButton.disableProperty().bind(envio);
+			enviarButton.disableProperty().bind(textoField.textProperty().isEmpty());
+
+			minasArea.textProperty().bind(escuchaObj.messageProperty());
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -145,15 +263,12 @@ public class PlayerController implements Initializable {
 		return view;
 	}
 
-	public Buscaminas getPanel() {
+	public Tablero getPanel() {
 		return panel;
 	}
 
-	public void setPanel(Buscaminas panel) {
+	public void setPanel(Tablero panel) {
 		this.panel = panel;
-	}
-	public static void seteoPanel(Buscaminas pane) {
-		buscaminasPane.setCenter(pane);
 	}
 
 	class ChatReceive extends Thread {
@@ -172,9 +287,9 @@ public class PlayerController implements Initializable {
 				while (!isInterrupted()) {
 					if (lectura.available() > 1) {
 						String texto = lectura.readUTF();
-						textoArea.setText(">>>> " + texto + "\n" + textoArea.getText());
+						textoArea.setText(">> " + texto + "\n" + textoArea.getText());
 
-						System.out.println("Hablo desde hiloChat, leido");
+//System.out.println("Hablo desde hiloChat, leido");
 
 					}
 
@@ -191,7 +306,7 @@ public class PlayerController implements Initializable {
 		}
 	}
 
-	class ObjectReceive extends Thread {
+	class ObjectReceive extends Task<Void> {
 
 		private ObjectInputStream lectura;
 
@@ -199,90 +314,123 @@ public class PlayerController implements Initializable {
 			this.lectura = in;
 		}
 
+//		@Override
+//		public void run() {
+//			try {
+//				System.out.println("Escuchando");
+//				int i = 0, alto=0, ancho=0, minaNum=0;
+//				String[][] minas = null;
+//				String[][] campo = null;
+//
+//				while (!isInterrupted()) {
+//					if (lectura.available() > 1) {
+//						try {
+//							if (i == 0) {
+//								campo = (String[][]) ois.readObject();
+//System.out.println("Lectura 1, campoVita");
+//								i++;
+//							} else if (i == 1) {
+//								minas = (String[][]) ois.readObject();
+//System.out.println("Lectura 2, minas");
+//								i++;
+//							} else if (i == 3) {
+//								alto = (int) ois.readObject();
+//System.out.println("Lectura 3, alto");
+//								i++;
+//							} else if (i == 2) {
+//								ancho = (int) ois.readObject();
+//System.out.println("Lectura 4, ancho");
+//								i++;
+//
+//							} else if (i == 4) {
+//								minaNum = (int) ois.readObject();
+//System.out.println("Lectura 5, numMinas");
+//								i++;
+//							} else if (i == 5) {
+//System.out.println("Hablo desde hiloObjeto, creando Tablero");
+//								Tablero panelito = new Tablero(campo, minas, alto, ancho, minaNum);
+//System.out.println(panelito);
+//								envio.set(false);
+//								
+//								i = 0;
+//							}
+//
+//						} catch (ClassNotFoundException e) {
+//							e.printStackTrace();
+//						} catch (IOException e) {
+//							e.printStackTrace();
+//						}
+//
+//					}
+//				}
+//
+//				lectura.close();
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
+
+//		public void interrumpir() {
+//			interrupt();
+//		}
+
 		@Override
-		public void run() {
+		protected Void call() throws Exception {
 			try {
 				System.out.println("Escuchando");
-				int i = 0, maxMinas = 0;
-				boolean[][] minas = null;
-				boolean[][] botones = null;
-				String[][] texto = null;
+//				int i = 0, alto=0, ancho=0, minaNum=0;
+//				String[][] minas = null;
+//				String[][] campo = null;
+//
+//				while (!isCancelled()) {
+//						try {
+//							if (i == 0) {
+//								campo = (String[][]) ois.readObject();
+//System.out.println("Lectura 1, campoVita");
+//								i++;
+//							} else if (i == 1) {
+//								minas = (String[][]) ois.readObject();
+//System.out.println("Lectura 2, minas");
+//								i++;
+//							} else if (i == 2) {
+//								alto = (int) ois.readObject();
+//System.out.println("Lectura 3, alto");
+//								i++;
+//							} else if (i == 3) {
+//								ancho = (int) ois.readObject();
+//System.out.println("Lectura 4, ancho");
+//								i++;
+//
+//							} else if (i == 4) {
+//								minaNum = (int) ois.readObject();
+//System.out.println("Lectura 5, numMinas");
+//								i++;
+//							} else if (i == 5) {
+//System.out.println("Hablo desde hiloObjeto, creando Tablero");
+//								Tablero panelito = new Tablero(campo, minas, alto, ancho, minaNum);
+//System.out.println(panelito);
+//								envio.set(false);
+//								
+//								panel = panelito;
+//								
+//								updateMessage(panelito.toString());
+//								
+//								i = 0;
+//							}
+				while(!isCancelled()) {
 
-				while (!isInterrupted()) {
-//					if (lectura.available() > 1) {
-						try {
-							System.out.println("Hablo desde hiloObjeto, recibido");
-							if (i == 0) {
+				System.out.println("Hablo desde hiloObjeto, creando Tablero");
+				panel = (Tablero) ois.readObject();
 
-								minas = (boolean[][]) ois.readObject();
-
-								System.out.println("Lectura 1");
-								i++;
-							} else if (i == 1) {
-
-								maxMinas = (int) ois.readObject();
-
-								System.out.println("Lectura 2");
-								i++;
-							} else if (i == 3) {
-
-								botones = (boolean[][]) ois.readObject();
-
-								System.out.println("Lectura 4");
-								i++;
-							} else if (i == 2) {
-
-								texto = (String[][]) ois.readObject();
-
-								System.out.println("Lectura 3");
-								i++;
+System.out.println(panel);
+				envio.set(false);
 								
-							}else if(i==4) {
-								Buscaminas panelito = new Buscaminas();
-								panelito.setMinas(minas);
-								panelito.setMaxMinas(maxMinas);
-								
-								Casilla3[][] casillas = new Casilla3[botones.length][botones[0].length];
-								
-								for (int l = 0; l < casillas.length; l++) {
-									for (int m = 0; m < casillas.length; m++) {
-										System.out.print("Nueva casillita ");
-										if(texto[l][m].equals(""))
-											texto[l][m]= " ";
-										System.out.println("Mi string "+texto[l][m]+ " boolean "+botones[l][m]);
-										casillas[l][m]= new Casilla3(texto[l][m], botones[l][m]);
-									}
-
-									System.out.println("Nueva linea de casillitas");
-								}
-								
-								panelito.setCasilla3(casillas);
-	System.out.println(panelito);
-								seteoPanel(panelito);
-								envio.set(false);
-								i = 0;
-							}
-
-							System.out.println("Hablo desde hiloObjeto, recibido Todo");
-
-						} catch (ClassNotFoundException e) {
-							e.printStackTrace();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-						textoArea.setText("Minas recibidas\n" + textoArea.getText());
-					}
-
-//				}
-
+				updateMessage(panel.toString());
+}
 				lectura.close();
 			} catch (Exception e) {
 				e.printStackTrace();
-			}
-		}
-
-		public void interrumpir() {
-			interrupt();
+			}			return null;
 		}
 	}
 }

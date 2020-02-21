@@ -25,7 +25,7 @@ import javafx.scene.layout.BorderPane;
 public class ServerController implements Initializable {
 
 	// model
-	private Buscaminas panel;
+	private Tablero panel;
 
 	public static ArrayList<Jugador> clientesChat = new ArrayList<Jugador>();
 	public static ArrayList<Jugador> clientesMinas = new ArrayList<Jugador>();
@@ -75,13 +75,13 @@ public class ServerController implements Initializable {
 		if (result.isPresent()) {
 			dificultad = result.get();
 			if (dificultad.equals("Difícil")) {
-				panel = new Buscaminas(15, 15, 110);
+				panel = new Tablero(15, 15, 110);
 			} else if (dificultad.equals("Media")) {
-				panel = new Buscaminas(10, 10, 40);
+				panel = new Tablero(10, 10, 40);
 			} else if (dificultad.equals("Fácil")) {
-				panel = new Buscaminas(5, 5, 5);
+				panel = new Tablero(5, 5, 5);
 			} else {
-				panel = new Buscaminas(15, 15, 225);
+				panel = new Tablero(15, 15, 225);
 			}
 		}
 
@@ -100,49 +100,24 @@ public class ServerController implements Initializable {
 				System.out.println("Jugador aceptado ;D "+jugadores);
 			} while (jugadores != 0);
 
+			ServerController.clientesMinas.get(0).outObjeto.writeObject(panel);
+			System.out.println("ENVIO AL 1 tablero");
 
-			ServerController.clientesMinas.get(0).outObjeto.writeObject(panel.getMinas());
-			System.out.println("ENVIO AL 1 Minas");
 
-			ServerController.clientesMinas.get(0).outObjeto.writeObject(panel.getMaxMinas());
-			System.out.println("ENVIO AL 1 int minasMaximas");
-			
-//			ServerController.clientesMinas.get(0).outObjeto.writeObject(panel.getCasilla3());
-//			System.out.println("ENVIO AL 1 Casilla3");
-			
-			String[][] texto;
-			boolean[][] booleanButton;
-			if (dificultad.equals("Media")) {
-				texto = new String[10][10];
-				booleanButton = new boolean[10][10];
-			} else if (dificultad.equals("Fácil")) {
-				texto = new String[5][5];
-				System.out.println("Soy texto: "+texto.length);
-				System.out.println("Soy texto[0]: "+texto[0].length);
-				booleanButton = new boolean[5][5];
-			} else {
-				texto = new String[15][15];
-				booleanButton = new boolean[15][15];
-			}
-			
-			for(int i=0; i<texto.length;i++) {
-				for(int j=0; j<texto[i].length; j++) {
-					texto[i][j]=
-							panel.getCasilla3()[i][j].getText();
-				}
-			}
-			
-			for(int i=0; i<texto.length;i++) {
-				for(int j=0; j<texto[i].length; j++) {
-					booleanButton[i][j]= panel.getCasilla3()[i][j].isDescubierta();
-				}
-			}
-			
-			ServerController.clientesMinas.get(0).outObjeto.writeObject(texto);
-			System.out.println("ENVIO AL 1 textoMinas");
-			
-			ServerController.clientesMinas.get(0).outObjeto.writeObject(booleanButton);
-			System.out.println("ENVIO AL 1 booleanButton");
+//			ServerController.clientesMinas.get(0).outObjeto.writeObject(panel.getCampoVista());
+//			System.out.println("ENVIO AL 1 campo");
+//			
+//			ServerController.clientesMinas.get(0).outObjeto.writeObject(panel.getCampo());
+//			System.out.println("ENVIO AL 1 minas");
+//
+//			ServerController.clientesMinas.get(0).outObjeto.writeObject(panel.getAlto());
+//			System.out.println("ENVIO AL 1 alto");
+//			
+//			ServerController.clientesMinas.get(0).outObjeto.writeObject(panel.getAncho());
+//			System.out.println("ENVIO AL 1 ancho");
+//			
+//			ServerController.clientesMinas.get(0).outObjeto.writeObject(panel.getNumMinas());
+//			System.out.println("ENVIO AL 1 minasMaximas");
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -221,7 +196,7 @@ public class ServerController implements Initializable {
 
 							if (jugador >= ServerController.clientesMinas.size())
 								jugador = 0;
-							Buscaminas buscaminas = (Buscaminas) cliente.inObjeto.readObject();
+							Tablero buscaminas = (Tablero) cliente.inObjeto.readObject();
 							ServerController.clientesMinas.get(jugador).outObjeto.writeObject(buscaminas);
 							
 System.out.println("Hablo desde hiloMina, mando Buscaminas");
@@ -278,7 +253,8 @@ System.out.println("Hablo desde hiloMina, mando Buscaminas");
 								ServerController.clientesChat.get(i).dos.writeUTF(texto);
 						}
 						
-System.out.println("Hablo desde hiloChat, mando Buscaminas");
+						textoArea.setText(texto+"\n"+textoArea.getText());
+System.out.println("Hablo desde hiloChat, mando chat");
 						
 					}
 
