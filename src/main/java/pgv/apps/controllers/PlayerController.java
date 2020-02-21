@@ -161,7 +161,7 @@ public class PlayerController implements Initializable {
 
 		int resultado = panel.clickCasilla(Integer.valueOf(casilla.getKey()) - 1,
 				Integer.valueOf(casilla.getValue()) - 1);
-
+System.out.println(casilla.getKey() + " "+casilla.getValue());
 		if (resultado != -2) {
 			if (resultado == -1) {
 				Alert alert = new Alert(AlertType.ERROR);
@@ -190,12 +190,14 @@ public class PlayerController implements Initializable {
 				alert.setTitle("¡Buena!");
 				alert.setHeaderText("Sabia elección");
 				alert.setContentText("No hay bomba, toca esperar a tu compañero");
+				alert.showAndWait();
 			}
 		}
 
 		envio.set(true);
 		try {
 			oos.writeObject(panel);
+System.out.println("envio");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -314,109 +316,10 @@ public class PlayerController implements Initializable {
 			this.lectura = in;
 		}
 
-//		@Override
-//		public void run() {
-//			try {
-//				System.out.println("Escuchando");
-//				int i = 0, alto=0, ancho=0, minaNum=0;
-//				String[][] minas = null;
-//				String[][] campo = null;
-//
-//				while (!isInterrupted()) {
-//					if (lectura.available() > 1) {
-//						try {
-//							if (i == 0) {
-//								campo = (String[][]) ois.readObject();
-//System.out.println("Lectura 1, campoVita");
-//								i++;
-//							} else if (i == 1) {
-//								minas = (String[][]) ois.readObject();
-//System.out.println("Lectura 2, minas");
-//								i++;
-//							} else if (i == 3) {
-//								alto = (int) ois.readObject();
-//System.out.println("Lectura 3, alto");
-//								i++;
-//							} else if (i == 2) {
-//								ancho = (int) ois.readObject();
-//System.out.println("Lectura 4, ancho");
-//								i++;
-//
-//							} else if (i == 4) {
-//								minaNum = (int) ois.readObject();
-//System.out.println("Lectura 5, numMinas");
-//								i++;
-//							} else if (i == 5) {
-//System.out.println("Hablo desde hiloObjeto, creando Tablero");
-//								Tablero panelito = new Tablero(campo, minas, alto, ancho, minaNum);
-//System.out.println(panelito);
-//								envio.set(false);
-//								
-//								i = 0;
-//							}
-//
-//						} catch (ClassNotFoundException e) {
-//							e.printStackTrace();
-//						} catch (IOException e) {
-//							e.printStackTrace();
-//						}
-//
-//					}
-//				}
-//
-//				lectura.close();
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//		}
-
-//		public void interrumpir() {
-//			interrupt();
-//		}
-
 		@Override
 		protected Void call() throws Exception {
 			try {
 				System.out.println("Escuchando");
-//				int i = 0, alto=0, ancho=0, minaNum=0;
-//				String[][] minas = null;
-//				String[][] campo = null;
-//
-//				while (!isCancelled()) {
-//						try {
-//							if (i == 0) {
-//								campo = (String[][]) ois.readObject();
-//System.out.println("Lectura 1, campoVita");
-//								i++;
-//							} else if (i == 1) {
-//								minas = (String[][]) ois.readObject();
-//System.out.println("Lectura 2, minas");
-//								i++;
-//							} else if (i == 2) {
-//								alto = (int) ois.readObject();
-//System.out.println("Lectura 3, alto");
-//								i++;
-//							} else if (i == 3) {
-//								ancho = (int) ois.readObject();
-//System.out.println("Lectura 4, ancho");
-//								i++;
-//
-//							} else if (i == 4) {
-//								minaNum = (int) ois.readObject();
-//System.out.println("Lectura 5, numMinas");
-//								i++;
-//							} else if (i == 5) {
-//System.out.println("Hablo desde hiloObjeto, creando Tablero");
-//								Tablero panelito = new Tablero(campo, minas, alto, ancho, minaNum);
-//System.out.println(panelito);
-//								envio.set(false);
-//								
-//								panel = panelito;
-//								
-//								updateMessage(panelito.toString());
-//								
-//								i = 0;
-//							}
 				while(!isCancelled()) {
 
 				System.out.println("Hablo desde hiloObjeto, creando Tablero");
@@ -426,7 +329,7 @@ System.out.println(panel);
 				envio.set(false);
 								
 				updateMessage(panel.toString());
-}
+				}
 				lectura.close();
 			} catch (Exception e) {
 				e.printStackTrace();

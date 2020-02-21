@@ -105,7 +105,6 @@ public class Tablero implements Serializable {
 					default:
 						campoVista[x][y] = Integer.toString(numMinas);
 					}
-					;
 				}
 			}
 	}

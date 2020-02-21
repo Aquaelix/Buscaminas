@@ -50,7 +50,7 @@
                   <Insets bottom="5.0" left="15.0" right="15.0" top="15.0" />
                </BorderPane.margin>
                <children>
-                  <Label text="Chanclas:" />
+                  <Label text="Minas:" />
                   <TextArea fx:id="minasArea" prefHeight="200.0" prefWidth="200.0" wrapText="true" VBox.vgrow="ALWAYS" />
                </children>
             </VBox>

@@ -190,13 +190,13 @@ public class ServerController implements Initializable {
 				System.out.println("Escuchando minas");
 
 				while (!isInterrupted()) {
-					if (cliente.inObjeto.available() > 1) {
 						try {
+							Tablero buscaminas = (Tablero) cliente.inObjeto.readObject();
+							
 							int jugador = ServerController.clientesMinas.indexOf(this.cliente) + 1;
 
 							if (jugador >= ServerController.clientesMinas.size())
 								jugador = 0;
-							Tablero buscaminas = (Tablero) cliente.inObjeto.readObject();
 							ServerController.clientesMinas.get(jugador).outObjeto.writeObject(buscaminas);
 							
 System.out.println("Hablo desde hiloMina, mando Buscaminas");
@@ -205,7 +205,6 @@ System.out.println("Hablo desde hiloMina, mando Buscaminas");
 							System.out.println("Vaya... un error: " + e.getMessage());
 							interrumpir();
 						}
-					}
 				}
 
 				System.out.println("Cerrando el socket de escucha");
