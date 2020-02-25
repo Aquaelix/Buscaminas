@@ -2,12 +2,15 @@ package pgv.apps.controllers;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.URL;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -15,6 +18,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -24,16 +28,23 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Popup;
 import javafx.util.Pair;
+import pgv.apps.logica.Emoji;
+import pgv.apps.logica.EmojisList;
+import pgv.apps.logica.Tablero;
 
 public class PlayerController implements Initializable {
 
@@ -44,13 +55,16 @@ public class PlayerController implements Initializable {
 	private ChatReceive escuchaChat;
 	private ObjectReceive escuchaObj;
 
-	private BooleanProperty envio = new SimpleBooleanProperty(false);
-
 	private Pair<String, String> casilla = null;
+
+	private Popup popupEmoji = new Popup();
+	private Popup popupAyuda = new Popup();
+	private ListView<Emoji> list = new ListView<Emoji>();
 
 	// model
 	private Tablero panel;
-	private String host;
+	private String host, usuario;
+	private BooleanProperty envio = new SimpleBooleanProperty(true);
 
 	@FXML
 	private SplitPane view;
@@ -68,23 +82,59 @@ public class PlayerController implements Initializable {
 	private Button escogerButton;
 
 	@FXML
+	private Button emojiButton;
+
+	@FXML
 	private Button enviarButton;
 
 	@FXML
 	public static BorderPane buscaminasPane;
 
 	@FXML
+	void onEmojiAction(ActionEvent event) {
+
+		List<Emoji> choices = EmojisList.emojis;
+
+		ChoiceDialog<Emoji> dialog = new ChoiceDialog<>(EmojisList.emojis.get(0), choices);
+
+		dialog.setTitle("¿Qué emoji deseas?");
+		dialog.setContentText("Inserto...");
+		Optional<Emoji> result = dialog.showAndWait();
+		if (result.isPresent()) {
+			textoField.setText(textoField.getText() + result.get().getValue());
+		}
+
+	}
+
+	@FXML
 	void onEnviarAction(ActionEvent event) {
 
-		try {
-			os.writeUTF(textoField.getText());
-
-			textoArea.setText("Tú: " + textoField.getText() + "\n" + textoArea.getText());
-
-			textoField.setText("");
-		} catch (IOException e) {
-			e.printStackTrace();
+		String texto = textoField.getText();
+		if (texto.equals("!limpiar")) {
+			textoArea.setText("");
+		} else if (texto.equals("!ayuda")) {
+			if (!popupAyuda.isShowing())
+				popupAyuda.show(view.getScene().getWindow());
+		} else if (texto.equals("!emojis")) {
+			if (!popupEmoji.isShowing())
+				popupEmoji.show(view.getScene().getWindow());
+		} else if (texto.equals("!salir")) {
+			try {
+				os.writeUTF(texto);
+				enviarButton.setDisable(true);
+				textoArea.setText("Has salido del juego, no podrás hablar ni seguir jugando.\n" + textoArea.getText());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				os.writeUTF(texto);
+				textoArea.setText("Tú: " + textoField.getText() + "\n" + textoArea.getText());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
+		textoField.setText("");
 	}
 
 	@FXML
@@ -115,29 +165,35 @@ public class PlayerController implements Initializable {
 
 		horizontal.textProperty().addListener((observable, oldValue, newValue) -> {
 			int lado = panel.getAlto();
-			if (lado == 5) {
-				loginButton.setDisable(
-						(!((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 53)) || newValue.trim().isEmpty()));
-			} else if (lado == 10) {
-				loginButton.setDisable(!(((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 57))
-						|| (newValue.charAt(0) == 65) || newValue.trim().isEmpty()));
-			} else {
-				loginButton.setDisable(!(((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 57))
-						|| ((newValue.charAt(0) >= 65) && (newValue.charAt(0) <= 70)) || newValue.trim().isEmpty()));
+			if (!newValue.isEmpty()) {
+				if (lado == 5) {
+					loginButton.setDisable(
+							(!((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 53)) || newValue.trim().isEmpty()));
+				} else if (lado == 10) {
+					loginButton.setDisable(!(((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 57))
+							|| (newValue.charAt(0) == 65) || newValue.trim().isEmpty()));
+				} else {
+					loginButton.setDisable(!(((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 57))
+							|| ((newValue.charAt(0) >= 65) && (newValue.charAt(0) <= 70))
+							|| newValue.trim().isEmpty()));
+				}
 			}
 		});
 
 		vertical.textProperty().addListener((observable, oldValue, newValue) -> {
 			int lado = panel.getAlto();
-			if (lado == 5) {
-				loginButton.setDisable(
-						(!((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 53)) || newValue.trim().isEmpty()));
-			} else if (lado == 10) {
-				loginButton.setDisable(!(((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 57))
-						|| (newValue.charAt(0) == 65) || newValue.trim().isEmpty()));
-			} else {
-				loginButton.setDisable(!(((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 57))
-						|| ((newValue.charAt(0) >= 65) && (newValue.charAt(0) <= 70)) || newValue.trim().isEmpty()));
+			if (!newValue.isEmpty()) {
+				if (lado == 5) {
+					loginButton.setDisable(
+							(!((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 53)) || newValue.trim().isEmpty()));
+				} else if (lado == 10) {
+					loginButton.setDisable(!(((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 57))
+							|| (newValue.charAt(0) == 65) || newValue.trim().isEmpty()));
+				} else {
+					loginButton.setDisable(!(((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 57))
+							|| ((newValue.charAt(0) >= 65) && (newValue.charAt(0) <= 70))
+							|| newValue.trim().isEmpty()));
+				}
 			}
 		});
 
@@ -157,20 +213,20 @@ public class PlayerController implements Initializable {
 					.println("Horizontal= " + usernamePassword.getKey() + ", Vertical= " + usernamePassword.getValue());
 			casilla = result.get();
 		});
-//añadir por aqui un mostrar antes de enviar y otro despues
-		String hor=casilla.getValue(), ver=casilla.getKey();
+
+		String hor = casilla.getValue(), ver = casilla.getKey();
 		int iHor, iVer;
-		if(hor.charAt(0)>=65)
-			iHor = (int) hor.charAt(0) -55;
+		if (hor.charAt(0) >= 65)
+			iHor = (int) hor.charAt(0) - 55;
 		else
 			iHor = Integer.valueOf(hor);
-		
-		if(ver.charAt(0)>=65)
-			iVer = (int) ver.charAt(0)-55;
+
+		if (ver.charAt(0) >= 65)
+			iVer = (int) ver.charAt(0) - 55;
 		else
 			iVer = Integer.valueOf(ver);
-		
-		int resultado = panel.clickCasilla(iHor - 1,iVer - 1);
+
+		int resultado = panel.clickCasilla(iHor - 1, iVer - 1);
 //		System.out.println("Panelsinbombas");
 //		System.out.println(panel);
 //		System.out.println("Panelbombas");
@@ -223,7 +279,15 @@ public class PlayerController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 
-		// resto de codigo
+		TextInputDialog dialogJ = new TextInputDialog(System.getProperty("user.name"));
+
+		dialogJ.setTitle("¿Nombre?");
+		dialogJ.setContentText("Me reconocerán como... ");
+		Optional<String> resultJ = dialogJ.showAndWait();
+		if (resultJ.isPresent()) {
+			usuario = resultJ.get();
+		}
+
 		TextInputDialog dialog = new TextInputDialog();
 		dialog.setTitle("Necesito IP");
 		dialog.setHeaderText("¿Y mi IP?");
@@ -257,15 +321,46 @@ public class PlayerController implements Initializable {
 			escuchaObj = new ObjectReceive(ois);
 			new Thread(escuchaObj).start();
 
-			// bindeo
-			escogerButton.disableProperty().bind(envio);
-			enviarButton.disableProperty().bind(textoField.textProperty().isEmpty());
-
-			minasArea.textProperty().bind(escuchaObj.messageProperty());
-
+			os.writeUTF(usuario);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		// bindeo
+		escogerButton.disableProperty().bind(envio);
+		enviarButton.disableProperty().bind(textoField.textProperty().isEmpty());
+
+		minasArea.textProperty().bind(escuchaObj.messageProperty());
+
+		list.getItems().addAll(EmojisList.emojis);
+		
+		EventHandler<MouseEvent> evento;
+		
+		evento = new EventHandler<MouseEvent>() {
+			public void handle(MouseEvent e) {
+				Emoji emoji = list.getSelectionModel().getSelectedItem();
+				textoField.setText(textoField.getText() + emoji.getValue());
+			}
+		};
+		list.setOnMouseClicked(evento);
+		
+		popupEmoji.getContent().add(list);
+		popupEmoji.setAutoHide(true);
+
+		TextArea textoAyuda = new TextArea("Lista de comandos:\n!hola\n" + "Saluda usando el nombre del usuario\n"
+				+ "!adios\n" + "Despide usando el nombre del usuario\n" + "!ayuda\n"
+				+ "Muestra esta ayuda de todos los comandos\n" + "!estado\n"
+				+ "Muestra \"pues aquí, ayudando que ustedes jueguen, comunicando mensajes y tableros\"\n" + "!salir\n"
+				+ "Permite la salida del juego al usuario que lo solicitó\n" + "!emojis\n"
+				+ "Muestra una lista completa de todos los emojis que hay para usar (en formato popup)\n" + "!limpiar\n"
+				+ "Permite limpiar el textarea del chat\r\n" + "!\"(nombre de un usuario)\"\n"
+				+ "Permite mandar todo el texto siguiente al usuario como si de un chat privado se tratase. Ej: !\"Juan José\" Hola Juan, preparado para perder? ;D\n"
+				+ "No funciona con caracteres que no sean alfanumericos. Se permiten las tildes.");
+		textoAyuda.setEditable(false);
+		textoAyuda.setWrapText(true);
+
+		popupAyuda.getContent().add(textoAyuda);
+		popupAyuda.setAutoHide(true);
 
 	}
 
@@ -305,12 +400,11 @@ public class PlayerController implements Initializable {
 				while (!isInterrupted()) {
 					if (lectura.available() > 1) {
 						String texto = lectura.readUTF();
-						textoArea.setText(">> " + texto + "\n" + textoArea.getText());
+						textoArea.setText(texto + "\n" + textoArea.getText());
 
 //System.out.println("Hablo desde hiloChat, leido");
 
 					}
-
 				}
 
 				lectura.close();
@@ -345,6 +439,7 @@ public class PlayerController implements Initializable {
 
 						updateMessage("Fin del juego, revisa con tu compañero los resultados.");
 						this.cancel();
+						break;
 					} else {
 //System.out.println(panel);
 						envio.set(false);
@@ -353,8 +448,11 @@ public class PlayerController implements Initializable {
 					}
 				}
 				lectura.close();
-			} catch (Exception e) {
-				e.printStackTrace();
+			} catch (EOFException e) {
+
+			} catch (SocketException e) {
+				System.out.println(
+						"Error con los sockets, probablemente se dedsconectó primero el servidor:\n" + e.getMessage());
 			}
 			return null;
 		}
