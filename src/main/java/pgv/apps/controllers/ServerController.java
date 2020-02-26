@@ -140,14 +140,15 @@ public class ServerController implements Initializable {
 					if (nv.matches("[0-9]*")) {
 						if (!alto.getText().isEmpty() && !ancho.getText().isEmpty()) {
 							int numMinas = Integer.valueOf(alto.getText()) * Integer.valueOf(ancho.getText());
-System.out.println(numMinas);
-							loginButton.setDisable(Integer.valueOf(nv) > numMinas*0.75 || Integer.valueOf(nv) < numMinas*0.25);
+							System.out.println(numMinas);
+							loginButton.setDisable(
+									Integer.valueOf(nv) > numMinas * 0.75 || Integer.valueOf(nv) < numMinas * 0.25);
 						}
 					} else {
 						popup.show(view.getScene().getWindow());
 					}
 				});
-				
+
 				dialog2.setResultConverter(dialogButton -> {
 					if (dialogButton == insertButton) {
 						return ancho.getText() + ":" + alto.getText() + ":" + minas.getText();
@@ -329,6 +330,12 @@ System.out.println(numMinas);
 										"Pues aquí, ayudando a que jueguen, comunicando mensajes y tableros.");
 							} else if (texto.equals("!salir")) {
 								interrumpir();
+							} else if (texto.equals("!usuarios")) {
+								String usuarios="";
+								for(int i=0; i<clientesChat.size(); i++) {
+									usuarios+="\""+clientesChat.get(i).nombre+"\"";
+								}
+								this.cliente.dos.writeUTF(usuarios);
 							} else if (texto.matches("(!\\\"([À-ÿ\\w\\s])*\\\")([À-ÿ\\w\\s.,:-])*")) {
 								System.out.println(texto);
 								String envio = "", receptor = "";

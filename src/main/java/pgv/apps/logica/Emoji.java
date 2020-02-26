@@ -7,7 +7,7 @@ import javafx.util.Pair;
  * {@link EmojiEnum} y su equivalente unicode para la impresión de emojis
  * 
  */
-public class Emoji extends Pair<EmojiEnum, String> {
+public class Emoji extends Pair<EmojiEnum, String> implements Comparable<Emoji>{
 
 	private static final long serialVersionUID = 1L;
 
@@ -18,5 +18,10 @@ public class Emoji extends Pair<EmojiEnum, String> {
 	@Override
 	public String toString() {
         return  this.getKey().toString().toLowerCase()+"("+this.getValue()+")";
+	}
+
+	@Override
+	public int compareTo(Emoji o) {
+		return this.getKey().toString().compareToIgnoreCase(o.getKey().toString());
 	}
 }

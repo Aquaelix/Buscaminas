@@ -93,9 +93,9 @@ public class PlayerController implements Initializable {
 	@FXML
 	void onEmojiAction(ActionEvent event) {
 
-		List<Emoji> choices = EmojisList.emojis;
+		List<Emoji> choices = EmojisList.emojisOrdenados;
 
-		ChoiceDialog<Emoji> dialog = new ChoiceDialog<>(EmojisList.emojis.get(0), choices);
+		ChoiceDialog<Emoji> dialog = new ChoiceDialog<>(EmojisList.emojisOrdenados.get(0), choices);
 
 		dialog.setTitle("¿Qué emoji deseas?");
 		dialog.setContentText("Inserto...");
@@ -332,10 +332,10 @@ public class PlayerController implements Initializable {
 
 		minasArea.textProperty().bind(escuchaObj.messageProperty());
 
-		list.getItems().addAll(EmojisList.emojis);
-		
+		list.getItems().addAll(EmojisList.emojisOrdenados);
+
 		EventHandler<MouseEvent> evento;
-		
+
 		evento = new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent e) {
 				Emoji emoji = list.getSelectionModel().getSelectedItem();
@@ -343,7 +343,7 @@ public class PlayerController implements Initializable {
 			}
 		};
 		list.setOnMouseClicked(evento);
-		
+
 		popupEmoji.getContent().add(list);
 		popupEmoji.setAutoHide(true);
 
@@ -353,14 +353,20 @@ public class PlayerController implements Initializable {
 				+ "Muestra \"pues aquí, ayudando que ustedes jueguen, comunicando mensajes y tableros\"\n" + "!salir\n"
 				+ "Permite la salida del juego al usuario que lo solicitó\n" + "!emojis\n"
 				+ "Muestra una lista completa de todos los emojis que hay para usar (en formato popup)\n" + "!limpiar\n"
-				+ "Permite limpiar el textarea del chat\r\n" + "!\"(nombre de un usuario)\"\n"
+				+ "Permite limpiar el textarea del chat\r\n" + "!usuarios\n"
+				+ "Permite visualizar los nombres de las personas que están jugando" + "!\"(nombre de un usuario)\"\n"
 				+ "Permite mandar todo el texto siguiente al usuario como si de un chat privado se tratase. Ej: !\"Juan José\" Hola Juan, preparado para perder? ;D\n"
-				+ "No funciona con caracteres que no sean alfanumericos. Se permiten las tildes.");
+				+ "No funciona con caracteres que no sean alfanumericos. Se permiten las tildes");
 		textoAyuda.setEditable(false);
 		textoAyuda.setWrapText(true);
 
 		popupAyuda.getContent().add(textoAyuda);
 		popupAyuda.setAutoHide(true);
+
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle("Y si...");
+		alert.setContentText("Prueba a usar \"!ayuda\" en el chat, a ver qué pasa");
+		alert.showAndWait();
 
 	}
 
