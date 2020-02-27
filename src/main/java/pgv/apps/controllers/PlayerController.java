@@ -354,7 +354,7 @@ public class PlayerController implements Initializable {
 				+ "Permite la salida del juego al usuario que lo solicitó\n" + "!emojis\n"
 				+ "Muestra una lista completa de todos los emojis que hay para usar (en formato popup)\n" + "!limpiar\n"
 				+ "Permite limpiar el textarea del chat\r\n" + "!usuarios\n"
-				+ "Permite visualizar los nombres de las personas que están jugando" + "!\"(nombre de un usuario)\"\n"
+				+ "Permite visualizar los nombres de las personas que están jugando\n" + "!\"(nombre de un usuario)\"\n"
 				+ "Permite mandar todo el texto siguiente al usuario como si de un chat privado se tratase. Ej: !\"Juan José\" Hola Juan, preparado para perder? ;D\n"
 				+ "No funciona con caracteres que no sean alfanumericos. Se permiten las tildes");
 		textoAyuda.setEditable(false);
