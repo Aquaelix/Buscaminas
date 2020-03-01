@@ -118,14 +118,6 @@ public class PlayerController implements Initializable {
 		} else if (texto.equals("!emojis")) {
 			if (!popupEmoji.isShowing())
 				popupEmoji.show(view.getScene().getWindow());
-		} else if (texto.equals("!salir")) {
-			try {
-				os.writeUTF(texto);
-				enviarButton.setDisable(true);
-				textoArea.setText("Has salido del juego, no podrás hablar ni seguir jugando.\n" + textoArea.getText());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 		} else {
 			try {
 				os.writeUTF(texto);
@@ -168,15 +160,16 @@ public class PlayerController implements Initializable {
 			if (!newValue.isEmpty()) {
 				if (lado == 5) {
 					loginButton.setDisable(
-							(!((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 53)) || newValue.trim().isEmpty()));
+							(!(newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 53)));
 				} else if (lado == 10) {
-					loginButton.setDisable(!(((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 57))
-							|| (newValue.charAt(0) == 65) || newValue.trim().isEmpty()));
+					loginButton.setDisable(!((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 57))
+							|| (newValue.charAt(0) == 65));
 				} else {
-					loginButton.setDisable(!(((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 57))
-							|| ((newValue.charAt(0) >= 65) && (newValue.charAt(0) <= 70))
-							|| newValue.trim().isEmpty()));
+					loginButton.setDisable(!((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 57))
+							|| ((newValue.charAt(0) >= 65) && (newValue.charAt(0) <= 70)));
 				}
+			}else {
+				loginButton.setDisable(true);
 			}
 		});
 
@@ -185,15 +178,16 @@ public class PlayerController implements Initializable {
 			if (!newValue.isEmpty()) {
 				if (lado == 5) {
 					loginButton.setDisable(
-							(!((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 53)) || newValue.trim().isEmpty()));
+							(!(newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 53)));
 				} else if (lado == 10) {
-					loginButton.setDisable(!(((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 57))
-							|| (newValue.charAt(0) == 65) || newValue.trim().isEmpty()));
+					loginButton.setDisable(!((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 57))
+							|| (newValue.charAt(0) == 65));
 				} else {
-					loginButton.setDisable(!(((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 57))
-							|| ((newValue.charAt(0) >= 65) && (newValue.charAt(0) <= 70))
-							|| newValue.trim().isEmpty()));
+					loginButton.setDisable(!((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 57))
+							|| ((newValue.charAt(0) >= 65) && (newValue.charAt(0) <= 70)));
 				}
+			}else {
+				loginButton.setDisable(true);
 			}
 		});
 
@@ -253,7 +247,7 @@ public class PlayerController implements Initializable {
 
 				minasArea.textProperty().unbind();
 				minasArea.setText(panel.showAll());
-
+				
 				panel.setCaput(true);
 				alert.showAndWait();
 //				Platform.exit();
@@ -269,7 +263,6 @@ public class PlayerController implements Initializable {
 		envio.set(true);
 		try {
 			oos.writeObject(panel);
-			System.out.println("envio");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -288,7 +281,7 @@ public class PlayerController implements Initializable {
 			usuario = resultJ.get();
 		}
 
-		TextInputDialog dialog = new TextInputDialog();
+		TextInputDialog dialog = new TextInputDialog("localhost");
 		dialog.setTitle("Necesito IP");
 		dialog.setHeaderText("¿Y mi IP?");
 		dialog.setContentText("Dame la IP:");
@@ -350,8 +343,7 @@ public class PlayerController implements Initializable {
 		TextArea textoAyuda = new TextArea("Lista de comandos:\n!hola\n" + "Saluda usando el nombre del usuario\n"
 				+ "!adios\n" + "Despide usando el nombre del usuario\n" + "!ayuda\n"
 				+ "Muestra esta ayuda de todos los comandos\n" + "!estado\n"
-				+ "Muestra \"pues aquí, ayudando que ustedes jueguen, comunicando mensajes y tableros\"\n" + "!salir\n"
-				+ "Permite la salida del juego al usuario que lo solicitó\n" + "!emojis\n"
+				+ "Muestra \"pues aquí, ayudando que ustedes jueguen, comunicando mensajes y tableros\"\n" +  "!emojis\n"
 				+ "Muestra una lista completa de todos los emojis que hay para usar (en formato popup)\n" + "!limpiar\n"
 				+ "Permite limpiar el textarea del chat\r\n" + "!usuarios\n"
 				+ "Permite visualizar los nombres de las personas que están jugando\n" + "!\"(nombre de un usuario)\"\n"
@@ -406,8 +398,12 @@ public class PlayerController implements Initializable {
 				while (!isInterrupted()) {
 					if (lectura.available() > 1) {
 						String texto = lectura.readUTF();
-						textoArea.setText(texto + "\n" + textoArea.getText());
-
+						if(!texto.equals("!salir")) {
+							textoArea.setText(texto + "\n" + textoArea.getText());	
+						}else {
+							break;
+						}
+						
 //System.out.println("Hablo desde hiloChat, leido");
 
 					}
@@ -417,10 +413,6 @@ public class PlayerController implements Initializable {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
-
-		public void interrumpir() {
-			interrupt();
 		}
 	}
 
@@ -442,9 +434,10 @@ public class PlayerController implements Initializable {
 					panel = (Tablero) ois.readObject();
 
 					if (panel.isCaput()) {
-
 						updateMessage("Fin del juego, revisa con tu compañero los resultados.");
 						this.cancel();
+//						oos.close();
+						os.writeUTF("!salir");
 						break;
 					} else {
 //System.out.println(panel);

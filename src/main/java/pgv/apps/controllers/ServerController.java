@@ -273,13 +273,14 @@ public class ServerController implements Initializable {
 						ServerController.clientesMinas.get(jugador).outObjeto.writeObject(buscaminas);
 
 						if (buscaminas.isCaput())
-							this.interrumpir();
+							break;
 
 //System.out.println("Hablo desde hiloMina, mando Buscaminas");
 
 					} catch (Exception e) {
+						e.printStackTrace();
 						System.out.println("Vaya... un error: " + e.getMessage());
-						interrumpir();
+						break;
 					}
 				}
 
@@ -288,17 +289,6 @@ public class ServerController implements Initializable {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
-
-		public void interrumpir() {
-			try {
-				cliente.inObjeto.close();
-				cliente.outObjeto.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			ServerController.clientesMinas.remove(cliente);
-			interrupt();
 		}
 
 	}
@@ -327,19 +317,19 @@ public class ServerController implements Initializable {
 							textoArea.setText("Jugador: " + cliente.nombre + " conectado.\n" + textoArea.getText());
 						} else {
 							System.out.println(texto);
-							if (texto.equals("!hola")) {
+							if (texto.equals("!salir")) {
+								break;
+							} else if (texto.equals("!hola")) {
 								this.cliente.dos.writeUTF("¿Qué pasó " + this.cliente.nombre + "?");
 							} else if (texto.equals("!adios")) {
 								this.cliente.dos.writeUTF("Hasta la vista " + this.cliente.nombre);
 							} else if (texto.equals("!estado")) {
 								this.cliente.dos.writeUTF(
 										"Pues aquí, ayudando a que jueguen, comunicando mensajes y tableros.");
-							} else if (texto.equals("!salir")) {
-								interrumpir();
 							} else if (texto.equals("!usuarios")) {
-								String usuarios="";
-								for(int i=0; i<clientesChat.size(); i++) {
-									usuarios+="\""+clientesChat.get(i).nombre+"\"";
+								String usuarios = "";
+								for (int i = 0; i < clientesChat.size(); i++) {
+									usuarios += "\"" + clientesChat.get(i).nombre + "\"";
 								}
 								this.cliente.dos.writeUTF(usuarios);
 							} else if (texto.matches("(!\\\"([À-ÿ\\w\\s])*\\\")([À-ÿ\\w\\s.,:-])*")) {
@@ -414,12 +404,6 @@ public class ServerController implements Initializable {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
-
-		public void interrumpir() {
-			ServerController.clientesChat.remove(cliente);
-			ServerController.clientesMinas.remove(cliente);
-			interrupt();
 		}
 
 	}
