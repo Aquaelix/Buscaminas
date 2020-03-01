@@ -120,32 +120,38 @@ public class ServerController implements Initializable {
 				Node loginButton = dialog2.getDialogPane().lookupButton(insertButton);
 				loginButton.setDisable(true);
 
-				ancho.textProperty().addListener((observable, oldValue, newValue) -> {
-					if (newValue.matches("[0-9]*")) {
-						loginButton.setDisable(Integer.valueOf(newValue) >= 1 && Integer.valueOf(newValue) <= 15);
-					} else {
-						popup.show(view.getScene().getWindow());
+				ancho.textProperty().addListener((o, ov, nv) -> {
+					if (!nv.trim().equals("")) {
+						if (nv.matches("[0-9]*")) {
+							loginButton.setDisable(Integer.valueOf(nv) >= 1 && Integer.valueOf(nv) <= 15);
+						} else {
+							popup.show(view.getScene().getWindow());
+						}
 					}
 				});
 
-				alto.textProperty().addListener((observable, oldValue, newValue) -> {
-					if (newValue.matches("[0-9]*")) {
-						loginButton.setDisable(Integer.valueOf(newValue) >= 1 && Integer.valueOf(newValue) <= 15);
-					} else {
-						popup.show(view.getScene().getWindow());
+				alto.textProperty().addListener((o, ov, nv) -> {
+					if (!nv.trim().equals("")) {
+						if (nv.matches("[0-9]*")) {
+
+							loginButton.setDisable(Integer.valueOf(nv) >= 1 && Integer.valueOf(nv) <= 15);
+						} else {
+							popup.show(view.getScene().getWindow());
+						}
 					}
 				});
 
 				minas.textProperty().addListener((o, ov, nv) -> {
-					if (nv.matches("[0-9]*")) {
-						if (!alto.getText().isEmpty() && !ancho.getText().isEmpty()) {
-							int numMinas = Integer.valueOf(alto.getText()) * Integer.valueOf(ancho.getText());
-							System.out.println(numMinas);
-							loginButton.setDisable(
-									Integer.valueOf(nv) > numMinas * 0.75 || Integer.valueOf(nv) < numMinas * 0.25);
+					if (!nv.trim().equals("")) {
+						if (nv.matches("[0-9]*")) {
+							if (!alto.getText().isEmpty() && !ancho.getText().isEmpty()) {
+								int numMinas = Integer.valueOf(alto.getText()) * Integer.valueOf(ancho.getText());
+								loginButton.setDisable(
+										Integer.valueOf(nv) > numMinas * 0.75 || Integer.valueOf(nv) < numMinas * 0.25);
+							}
+						} else {
+							popup.show(view.getScene().getWindow());
 						}
-					} else {
-						popup.show(view.getScene().getWindow());
 					}
 				});
 
