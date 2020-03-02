@@ -320,12 +320,12 @@ public class ServerController implements Initializable {
 							if (texto.equals("!salir")) {
 								break;
 							} else if (texto.equals("!hola")) {
-								this.cliente.dos.writeUTF("¿Qué pasó " + this.cliente.nombre + "?");
+								this.cliente.dos.writeUTF("¿Que paso " + this.cliente.nombre + "?");
 							} else if (texto.equals("!adios")) {
 								this.cliente.dos.writeUTF("Hasta la vista " + this.cliente.nombre);
 							} else if (texto.equals("!estado")) {
 								this.cliente.dos.writeUTF(
-										"Pues aquí, ayudando a que jueguen, comunicando mensajes y tableros.");
+										"Pues aqui, ayudando a que jueguen, comunicando mensajes y tableros.");
 							} else if (texto.equals("!usuarios")) {
 								String usuarios = "";
 								for (int i = 0; i < clientesChat.size(); i++) {
