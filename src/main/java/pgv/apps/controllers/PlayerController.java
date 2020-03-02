@@ -61,6 +61,8 @@ public class PlayerController implements Initializable {
 	private Popup popupAyuda = new Popup();
 	private ListView<Emoji> list = new ListView<Emoji>();
 
+	private Node loginButton;
+
 	// model
 	private Tablero panel;
 	private String host, usuario;
@@ -152,44 +154,12 @@ public class PlayerController implements Initializable {
 		grid.add(new Label("Vertical: "), 0, 1);
 		grid.add(vertical, 1, 1);
 
-		Node loginButton = dialog.getDialogPane().lookupButton(insertButton);
+		loginButton = dialog.getDialogPane().lookupButton(insertButton);
 		loginButton.setDisable(true);
 
-		horizontal.textProperty().addListener((observable, oldValue, newValue) -> {
-			int lado = panel.getAlto();
-			if (!newValue.isEmpty()) {
-				if (lado == 5) {
-					loginButton.setDisable(
-							(!(newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 53)));
-				} else if (lado == 10) {
-					loginButton.setDisable(!((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 57))
-							|| (newValue.charAt(0) == 65));
-				} else {
-					loginButton.setDisable(!((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 57))
-							|| ((newValue.charAt(0) >= 65) && (newValue.charAt(0) <= 70)));
-				}
-			}else {
-				loginButton.setDisable(true);
-			}
-		});
+		horizontal.textProperty().addListener((o, ov, nv) -> checkDisableButton(nv, true));
 
-		vertical.textProperty().addListener((observable, oldValue, newValue) -> {
-			int lado = panel.getAlto();
-			if (!newValue.isEmpty()) {
-				if (lado == 5) {
-					loginButton.setDisable(
-							(!(newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 53)));
-				} else if (lado == 10) {
-					loginButton.setDisable(!((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 57))
-							|| (newValue.charAt(0) == 65));
-				} else {
-					loginButton.setDisable(!((newValue.charAt(0) >= 49) && (newValue.charAt(0) <= 57))
-							|| ((newValue.charAt(0) >= 65) && (newValue.charAt(0) <= 70)));
-				}
-			}else {
-				loginButton.setDisable(true);
-			}
-		});
+		vertical.textProperty().addListener((o, ov, nv) -> checkDisableButton(nv, false));
 
 		dialog.getDialogPane().setContent(grid);
 
@@ -247,7 +217,7 @@ public class PlayerController implements Initializable {
 
 				minasArea.textProperty().unbind();
 				minasArea.setText(panel.showAll());
-				
+
 				panel.setCaput(true);
 				alert.showAndWait();
 //				Platform.exit();
@@ -265,6 +235,39 @@ public class PlayerController implements Initializable {
 			oos.writeObject(panel);
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	private void checkDisableButton(String nv, boolean b) {
+		int lado, input;
+
+		if (nv.matches("[0-9A-F]+")) {
+			if (b) {
+				lado = panel.getAncho();
+			} else {
+				lado = panel.getAlto();
+			}
+			
+			try {
+				input = Integer.valueOf(nv);
+			} catch (NumberFormatException e) {
+				input = Integer.valueOf(nv.charAt(0));
+			}
+			System.out.println(input);
+			if (input > 0 && input <= lado) {
+				if (input <= 10) {
+					loginButton.setDisable(false);
+				} else {
+					loginButton.setDisable(true);
+				}
+			} else if(lado >=10 && input>=65 && input<=70){
+				loginButton.setDisable(false);
+			}else {
+				loginButton.setDisable(true);
+			}
+
+		} else {
+			loginButton.setDisable(true);
 		}
 	}
 
@@ -343,7 +346,7 @@ public class PlayerController implements Initializable {
 		TextArea textoAyuda = new TextArea("Lista de comandos:\n!hola\n" + "Saluda usando el nombre del usuario\n"
 				+ "!adios\n" + "Despide usando el nombre del usuario\n" + "!ayuda\n"
 				+ "Muestra esta ayuda de todos los comandos\n" + "!estado\n"
-				+ "Muestra \"pues aquí, ayudando que ustedes jueguen, comunicando mensajes y tableros\"\n" +  "!emojis\n"
+				+ "Muestra \"pues aquí, ayudando que ustedes jueguen, comunicando mensajes y tableros\"\n" + "!emojis\n"
 				+ "Muestra una lista completa de todos los emojis que hay para usar (en formato popup)\n" + "!limpiar\n"
 				+ "Permite limpiar el textarea del chat\r\n" + "!usuarios\n"
 				+ "Permite visualizar los nombres de las personas que están jugando\n" + "!\"(nombre de un usuario)\"\n"
@@ -398,12 +401,12 @@ public class PlayerController implements Initializable {
 				while (!isInterrupted()) {
 					if (lectura.available() > 1) {
 						String texto = lectura.readUTF();
-						if(!texto.equals("!salir")) {
-							textoArea.setText(texto + "\n" + textoArea.getText());	
-						}else {
+						if (!texto.equals("!salir")) {
+							textoArea.setText(texto + "\n" + textoArea.getText());
+						} else {
 							break;
 						}
-						
+
 //System.out.println("Hablo desde hiloChat, leido");
 
 					}
