@@ -62,6 +62,8 @@ public class PlayerController implements Initializable {
 	private ListView<Emoji> list = new ListView<Emoji>();
 
 	private Node loginButton;
+	private TextField vertical;
+	private TextField horizontal;
 
 	// model
 	private Tablero panel;
@@ -146,8 +148,8 @@ public class PlayerController implements Initializable {
 		grid.setVgap(10);
 		grid.setPadding(new Insets(20, 150, 10, 10));
 
-		TextField horizontal = new TextField();
-		TextField vertical = new TextField();
+		horizontal = new TextField();
+		vertical = new TextField();
 
 		grid.add(new Label("Horizontal: "), 0, 0);
 		grid.add(horizontal, 1, 0);
@@ -240,13 +242,17 @@ public class PlayerController implements Initializable {
 
 	private void checkDisableButton(String nv, boolean b) {
 		int lado, input;
+		String otherValue; //el valor del otro textField
 
-		if (nv.matches("[0-9A-F]+")) {
-			if (b) {
-				lado = panel.getAncho();
-			} else {
-				lado = panel.getAlto();
-			}
+		if (b) {
+			lado = panel.getAncho();
+			otherValue = vertical.getText();
+		} else {
+			lado = panel.getAlto();
+			otherValue = horizontal.getText();
+		}
+		
+		if (nv.matches("[0-9A-F]+") && otherValue.matches("[0-9A-F]+")) {	
 			
 			try {
 				input = Integer.valueOf(nv);
