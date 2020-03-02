@@ -53,14 +53,14 @@ public class ServerController implements Initializable {
 	public void initialize(URL location, ResourceBundle resources) {
 
 		popup.setAutoHide(true);
-		popup.getContent().add(new Label("Solo carácteres numéricos."));
+		popup.getContent().add(new Label("Solo caracteres numericos."));
 
 		int numPuertoChat = 5555, numPuertoObjeto = 5556;
 
 		TextInputDialog dialogJ = new TextInputDialog("2");
 
-		dialogJ.setTitle("¿Cuántos jugadores son?");
-		dialogJ.setContentText("Número de jugadores:");
+		dialogJ.setTitle("Necesito el numero de jugadores");
+		dialogJ.setContentText("Numero de jugadores:");
 		int jugadores = 0;
 		Optional<String> resultJ = dialogJ.showAndWait();
 		if (resultJ.isPresent()) {
@@ -69,32 +69,32 @@ public class ServerController implements Initializable {
 		}
 
 		List<String> choices = new ArrayList<String>();
-		choices.add("Fácil");
+		choices.add("Facil");
 		choices.add("Media");
-		choices.add("Difícil");
+		choices.add("Dificil");
 		choices.add("Personalizado");
 		choices.add("99% imposible");
 
-		ChoiceDialog<String> dialog = new ChoiceDialog<>("Fácil", choices);
+		ChoiceDialog<String> dialog = new ChoiceDialog<>("Facil", choices);
 
-		dialog.setTitle("¿Qué dificultad desean?");
+		dialog.setTitle("¿Que dificultad desean?");
 		dialog.setContentText("Escoge el reto:");
 		String dificultad = null;
 		Optional<String> result = dialog.showAndWait();
 		if (result.isPresent()) {
 			dificultad = result.get();
-			if (dificultad.equals("Difícil")) {
+			if (dificultad.equals("Dificil")) {
 				panel = new Tablero(15, 15, 110);
 			} else if (dificultad.equals("Media")) {
 				panel = new Tablero(10, 10, 40);
-			} else if (dificultad.equals("Fácil")) {
+			} else if (dificultad.equals("Facil")) {
 				panel = new Tablero(5, 5, 5);
 			} else if (dificultad.equals("99% imposible")) {
 				panel = new Tablero(15, 15, 224);
 			} else {
 				Dialog<String> dialog2 = new Dialog<>();
 				dialog2.setTitle("Establezca su dificultad");
-				dialog2.setHeaderText("Tenga en cuenta que hay valores mínimos: ");
+				dialog2.setHeaderText("Tenga en cuenta que hay valores minimos: ");
 
 				ButtonType insertButton = new ButtonType("Seleccionar", ButtonData.OK_DONE);
 				dialog2.getDialogPane().getButtonTypes().addAll(insertButton, ButtonType.CANCEL);

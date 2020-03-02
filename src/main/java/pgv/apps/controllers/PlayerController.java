@@ -101,7 +101,7 @@ public class PlayerController implements Initializable {
 
 		ChoiceDialog<Emoji> dialog = new ChoiceDialog<>(EmojisList.emojisOrdenados.get(0), choices);
 
-		dialog.setTitle("¿Qué emoji deseas?");
+		dialog.setTitle("¿Que emoji deseas?");
 		dialog.setContentText("Inserto...");
 		Optional<Emoji> result = dialog.showAndWait();
 		if (result.isPresent()) {
@@ -125,7 +125,7 @@ public class PlayerController implements Initializable {
 		} else {
 			try {
 				os.writeUTF(texto);
-				textoArea.setText("Tú: " + textoField.getText() + "\n" + textoArea.getText());
+				textoArea.setText("Tu: " + textoField.getText() + "\n" + textoArea.getText());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -137,7 +137,7 @@ public class PlayerController implements Initializable {
 	void onSelectAction(ActionEvent event) {
 
 		Dialog<Pair<String, String>> dialog = new Dialog<>();
-		dialog.setTitle("¿Coordenadas?");
+		dialog.setTitle("Y escojo las coordenadas");
 		dialog.setHeaderText("Necesito la casilla: ");
 
 		ButtonType insertButton = new ButtonType("Seleccionar", ButtonData.OK_DONE);
@@ -213,9 +213,9 @@ public class PlayerController implements Initializable {
 //				Platform.exit();
 			} else if (resultado == 0) {
 				Alert alert = new Alert(AlertType.INFORMATION);
-				alert.setTitle("¡Felicidades!");
+				alert.setTitle("Felicidades");
 				alert.setHeaderText(null);
-				alert.setContentText("¡Has ganado!");
+				alert.setContentText("Has ganado");
 
 				minasArea.textProperty().unbind();
 				minasArea.setText(panel.showAll());
@@ -225,9 +225,9 @@ public class PlayerController implements Initializable {
 //				Platform.exit();
 			} else {
 				Alert alert = new Alert(AlertType.INFORMATION);
-				alert.setTitle("¡Buena!");
-				alert.setHeaderText("Sabia elección");
-				alert.setContentText("No hay bomba, toca esperar a tu compañero");
+				alert.setTitle("Buena");
+				alert.setHeaderText("Sabia eleccion");
+				alert.setContentText("No hay bomba, toca esperar a tu companero");
 				alert.showAndWait();
 			}
 		}
@@ -283,8 +283,8 @@ public class PlayerController implements Initializable {
 
 		TextInputDialog dialogJ = new TextInputDialog(System.getProperty("user.name"));
 
-		dialogJ.setTitle("¿Nombre?");
-		dialogJ.setContentText("Me reconocerán como... ");
+		dialogJ.setTitle("Tu nombre es...");
+		dialogJ.setContentText("Me conoceran como... ");
 		Optional<String> resultJ = dialogJ.showAndWait();
 		if (resultJ.isPresent()) {
 			usuario = resultJ.get();
@@ -292,7 +292,7 @@ public class PlayerController implements Initializable {
 
 		TextInputDialog dialog = new TextInputDialog("localhost");
 		dialog.setTitle("Necesito IP");
-		dialog.setHeaderText("¿Y mi IP?");
+		dialog.setHeaderText("Y mi IP es...");
 		dialog.setContentText("Dame la IP:");
 
 		Optional<String> result = dialog.showAndWait();
@@ -352,11 +352,11 @@ public class PlayerController implements Initializable {
 		TextArea textoAyuda = new TextArea("Lista de comandos:\n!hola\n" + "Saluda usando el nombre del usuario\n"
 				+ "!adios\n" + "Despide usando el nombre del usuario\n" + "!ayuda\n"
 				+ "Muestra esta ayuda de todos los comandos\n" + "!estado\n"
-				+ "Muestra \"pues aquí, ayudando que ustedes jueguen, comunicando mensajes y tableros\"\n" + "!emojis\n"
+				+ "Muestra \"pues aqui, ayudando que ustedes jueguen, comunicando mensajes y tableros\"\n" + "!emojis\n"
 				+ "Muestra una lista completa de todos los emojis que hay para usar (en formato popup)\n" + "!limpiar\n"
 				+ "Permite limpiar el textarea del chat\r\n" + "!usuarios\n"
 				+ "Permite visualizar los nombres de las personas que están jugando\n" + "!\"(nombre de un usuario)\"\n"
-				+ "Permite mandar todo el texto siguiente al usuario como si de un chat privado se tratase. Ej: !\"Juan José\" Hola Juan, preparado para perder? ;D\n"
+				+ "Permite mandar todo el texto siguiente al usuario como si de un chat privado se tratase. Ej: !\"Juan Jose\" Hola Juan, preparado para perder? ;D\n"
 				+ "No funciona con caracteres que no sean alfanumericos. Se permiten las tildes");
 		textoAyuda.setEditable(false);
 		textoAyuda.setWrapText(true);
@@ -366,7 +366,7 @@ public class PlayerController implements Initializable {
 
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("Y si...");
-		alert.setContentText("Prueba a usar \"!ayuda\" en el chat, a ver qué pasa");
+		alert.setContentText("Prueba a usar \"!ayuda\" en el chat, a ver que pasa");
 		alert.showAndWait();
 
 	}
@@ -443,7 +443,7 @@ public class PlayerController implements Initializable {
 					panel = (Tablero) ois.readObject();
 
 					if (panel.isCaput()) {
-						updateMessage("Fin del juego, revisa con tu compañero los resultados.");
+						updateMessage("Fin del juego, revisa con tu el resto los resultados.");
 						this.cancel();
 //						oos.close();
 						os.writeUTF("!salir");
@@ -460,7 +460,7 @@ public class PlayerController implements Initializable {
 
 			} catch (SocketException e) {
 				System.out.println(
-						"Error con los sockets, probablemente se dedsconectó primero el servidor:\n" + e.getMessage());
+						"Error con los sockets, probablemente se dedsconecto primero el servidor:\n" + e.getMessage());
 			}
 			return null;
 		}
